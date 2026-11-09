@@ -1,0 +1,978 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091d43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CASHper">
+<meta name="description" content="Gestiona tus ingresos, gastos y metas de ahorro.">
+<title>CASHper</title>
+
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<style>
+:root{
+  font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  background:#091d43;
+  color:#fff;
+}
+*{box-sizing:border-box}
+body{margin:0}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid #95c9ff;
+  outline-offset:2px;
+}
+.app{
+  max-width:620px;
+  min-height:100dvh;
+  margin:auto;
+  padding:12px 18px 40px;
+}
+.top{
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) 58px;
+  gap:5px;
+  align-items:start;
+}
+.header-logo{
+  width:min(100%,240px);
+  max-height:185px;
+  object-fit:contain;
+  justify-self:center;
+}
+.topicon{
+  border:0;
+  background:#15315b;
+  border-radius:15px;
+  padding:5px;
+  width:54px;
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.topicon img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+.screen{display:none}
+.screen.active{display:block}
+.home{
+  padding:12px 0 30px;
+  text-align:center;
+}
+.eyebrow{font-size:23px;font-weight:800}
+.balance{
+  font-size:clamp(45px,11vw,72px);
+  font-weight:900;
+  letter-spacing:-.06em;
+  margin:13px 0;
+}
+.hint,.sub{color:#b7d4f2;font-size:14px}
+.summary{
+  background:#fff;
+  color:#091d43;
+  border-radius:21px;
+  padding:22px;
+  margin:16px 0;
+}
+.home-summary{margin-top:8px}
+.metricrow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin:22px 0;
+}
+.metric{
+  border-radius:14px;
+  background:#c9e3ff;
+  color:#091d43;
+  padding:15px 7px;
+  font-size:13px;
+}
+.metric.expense{background:#ffeb98}
+.metric strong{
+  display:block;
+  font-size:20px;
+  margin-top:4px;
+}
+.primary,.secondary{
+  border:0;
+  border-radius:12px;
+  padding:13px 15px;
+  font-weight:800;
+}
+.primary{background:#ffe37c;color:#091d43}
+.secondary{background:#cbe4ff;color:#091d43}
+.toolbar{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin:17px 0;
+}
+.back{
+  border:0;
+  background:transparent;
+  color:white;
+  font-weight:700;
+  padding:12px 0;
+}
+.section-title{font-size:28px;margin:8px 0 6px}
+.year{
+  border-radius:16px;
+  overflow:hidden;
+  margin:13px 0;
+  background:#fff;
+  color:#091d43;
+}
+.year-head{
+  background:#c7e2ff;
+  padding:13px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:7px;
+}
+.year-name{
+  font-size:23px;
+  font-weight:900;
+  background:none;
+  border:0;
+  color:#091d43;
+}
+.mini-actions{
+  display:flex;
+  gap:3px;
+  align-items:center;
+}
+.mini{
+  border:0;
+  background:transparent;
+  color:#091d43;
+  padding:7px;
+  font-size:18px;
+  border-radius:7px;
+}
+.mini:focus-visible{outline:2px solid #091d43}
+.months{padding:8px 12px}
+.month{
+  border-bottom:1px solid #e4e9f0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:11px 0;
+}
+.month-main{
+  border:0;
+  background:none;
+  color:#091d43;
+  text-align:left;
+  flex:1;
+  min-width:0;
+  font-weight:750;
+}
+.month-main small{
+  display:block;
+  font-weight:500;
+  color:#54647a;
+  margin-top:4px;
+}
+.month .mini-actions{flex-shrink:0}
+.entry{
+  background:#fff;
+  color:#091d43;
+  border-radius:13px;
+  padding:14px;
+  margin:9px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:9px;
+}
+.entry.expense{background:#ffeb98}
+.entry small{
+  display:block;
+  color:#4d6179;
+  margin-top:3px;
+}
+.entry strong{overflow-wrap:anywhere}
+.amount{font-weight:900;white-space:nowrap}
+.right{text-align:right}
+.empty{
+  color:#b7d4f2;
+  padding:25px 8px;
+  text-align:center;
+}
+.year .empty{color:#51647d}
+.goal{
+  background:#fff;
+  color:#091d43;
+  border-radius:16px;
+  padding:16px;
+  margin:12px 0;
+}
+.goal-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:start;
+  gap:10px;
+}
+.goal-title{font-weight:850;font-size:18px}
+.progress{
+  height:12px;
+  background:#dbe9f6;
+  border-radius:20px;
+  overflow:hidden;
+  margin:12px 0 7px;
+}
+.progress>div{
+  height:100%;
+  background:#ffd750;
+  border-radius:20px;
+}
+.goal-meta{font-size:13px;color:#51647d}
+.modal-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#000a;
+  z-index:20;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  background:#fff;
+  color:#091d43;
+  width:min(100%,440px);
+  max-height:90dvh;
+  overflow:auto;
+  border-radius:20px;
+  padding:22px;
+}
+.modal h2{margin:0 0 14px}
+.field{
+  display:block;
+  margin:12px 0;
+  font-size:14px;
+  font-weight:750;
+}
+.field input,.field select{
+  display:block;
+  width:100%;
+  margin-top:5px;
+  padding:12px;
+  border:1px solid #a7b9cc;
+  border-radius:10px;
+  color:#091d43;
+  background:#fff;
+}
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:20px;
+}
+.notice{color:#53647b;font-size:13px}
+.export-buttons{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.export-buttons .mini{
+  font-size:12px;
+  background:#e5f0fb;
+  padding:8px;
+}
+.muted{color:#64748b}
+.small{font-size:13px}
+#printArea{display:none}
+
+@media(max-width:390px){
+  .app{padding-inline:12px}
+  .header-logo{max-height:155px}
+  .top{grid-template-columns:48px 1fr 48px}
+  .topicon{width:46px;height:46px}
+  .metric strong{font-size:17px}
+  .month{gap:3px}
+  .mini{padding:5px}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .app,.modal-backdrop{display:none!important}
+  #printArea{
+    display:block!important;
+    color:#000;
+    font:13px Arial,sans-serif;
+    padding:20px;
+  }
+  #printArea table{
+    border-collapse:collapse;
+    width:100%;
+  }
+  #printArea th,#printArea td{
+    border:1px solid #bbb;
+    padding:7px;
+    text-align:left;
+  }
+  #printArea h1{font-size:23px}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+  <header class="top">
+    <button id="dreamsBtn" class="topicon" aria-label="Metas de ahorro">
+      <img src="./dreams.png" alt="Dreams">
+    </button>
+    <img class="header-logo" src="./cabecero.png" alt="Cashper">
+    <button id="ghostBtn" class="topicon" aria-label="Años y meses">
+      <img src="./fantasma.png" alt="Cuentas">
+    </button>
+  </header>
+
+  <section id="home" class="screen active">
+    <div class="home">
+      <div class="eyebrow" id="homeMonth"></div>
+      <div class="summary home-summary">
+        <div class="sub" style="color:#51647d">Disponible este mes</div>
+        <div class="balance" id="homeBalance">0,00 €</div>
+        <div class="metricrow">
+          <div class="metric">
+            Ingresos
+            <strong id="homeIncome">0,00 €</strong>
+          </div>
+          <div class="metric expense">
+            Gastos
+            <strong id="homeExpense">0,00 €</strong>
+          </div>
+        </div>
+        <button class="primary" id="homeDetail">Ver movimientos</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="archive" class="screen">
+    <button class="back" data-nav="home">← Inicio</button>
+    <h1 class="section-title">Años y meses</h1>
+    <p class="sub">Consulta tus cuentas y exporta cada periodo.</p>
+    <div class="toolbar">
+      <button class="primary" id="addYear">+ Añadir año</button>
+    </div>
+    <div id="years"></div>
+  </section>
+
+  <section id="detail" class="screen">
+    <button class="back" data-nav="archive">← Años y meses</button>
+    <h1 class="section-title" id="detailTitle"></h1>
+    <div class="toolbar">
+      <button class="secondary" id="renameMonth">✎ Editar mes</button>
+      <button class="secondary" id="deleteMonth">⌫ Borrar mes</button>
+    </div>
+    <div class="summary">
+      <div class="sub" style="color:#51647d">Disponible</div>
+      <div class="balance" id="detailBalance"></div>
+      <div class="metricrow">
+        <div class="metric">
+          Ingresos
+          <strong id="incomeTotal"></strong>
+        </div>
+        <div class="metric expense">
+          Gastos
+          <strong id="expenseTotal"></strong>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="primary" id="addEntry">+ Movimiento</button>
+      <button class="secondary" id="setHome">Mostrar en inicio</button>
+      <button class="secondary" id="detailExcel">Excel</button>
+      <button class="secondary" id="detailPdf">PDF</button>
+    </div>
+    <div id="entries"></div>
+  </section>
+
+  <section id="dreams" class="screen">
+    <button class="back" data-nav="home">← Inicio</button>
+    <h1 class="section-title">Dreams</h1>
+    <p class="sub">Mis metas de ahorro</p>
+    <div class="toolbar">
+      <button class="primary" id="addGoal">+ Añadir meta</button>
+    </div>
+    <div id="goals"></div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle"></h2>
+    <form id="modalForm">
+      <div id="modalFields"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="cancel">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<script>
+(() => {
+'use strict';
+
+const KEY = 'cashper-data-v1';
+const NAMES = [
+  'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+];
+
+const $ = s => document.querySelector(s);
+const money = n => new Intl.NumberFormat('es-ES', {
+  style:'currency',currency:'EUR'
+}).format(Number(n)||0);
+const id = () => globalThis.crypto?.randomUUID?.() ||
+  String(Date.now())+Math.random().toString(36).slice(2);
+
+const node = (tag,cls,txt) => {
+  let e=document.createElement(tag);
+  if(cls)e.className=cls;
+  if(txt!==undefined)e.textContent=txt;
+  return e;
+};
+
+const initial=()=>({
+  years:{'2026':{},'2027':{}},
+  selected:{year:'2026',month:null},
+  goals:[]
+});
+
+let data;
+try{
+  data=JSON.parse(localStorage.getItem(KEY))||initial();
+  if(!data.years||!data.selected)throw Error();
+}catch{
+  data=initial();
+}
+if(!Array.isArray(data.goals))data.goals=[];
+
+let current=null,modalAction=null;
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const months=y=>data.years[y]||{};
+const entries=(y,m)=>months(y)[m]?.entries||[];
+
+const totals=(y,m)=>entries(y,m).reduce((a,e)=>{
+  a[e.type==='expense'?'expense':'income']+=Number(e.amount)||0;
+  return a;
+},{income:0,expense:0});
+
+function selection(){
+  let {year,month}=data.selected;
+  if(month!==null&&months(year)[month])return {year,month};
+  let d=new Date(),y=String(d.getFullYear()),m=String(d.getMonth());
+  if(months(y)[m])return {year:y,month:m};
+  for(let yr of Object.keys(data.years).sort())
+    for(let mo of Object.keys(months(yr)).sort((a,b)=>a-b))
+      return {year:yr,month:mo};
+  return null;
+}
+
+function show(name){
+  document.querySelectorAll('.screen').forEach(e=>
+    e.classList.toggle('active',e.id===name)
+  );
+  if(name==='home')renderHome();
+  if(name==='archive')renderArchive();
+  if(name==='detail')renderDetail();
+  if(name==='dreams')renderGoals();
+  window.scrollTo(0,0);
+}
+
+function renderHome(){
+  let s=selection();
+  let t=s?totals(s.year,s.month):{income:0,expense:0};
+  $('#homeMonth').textContent=s?`${NAMES[+s.month]} ${s.year}`:'Sin mes seleccionado';
+  $('#homeBalance').textContent=money(t.income-t.expense);
+  $('#homeIncome').textContent=money(t.income);
+  $('#homeExpense').textContent=money(t.expense);
+  $('#homeDetail').textContent=s?'Ver movimientos':'Crear primer mes';
+}
+
+function iconButton(label,symbol,fn){
+  let b=node('button','mini',symbol);
+  b.type='button';
+  b.title=label;
+  b.setAttribute('aria-label',label);
+  b.onclick=fn;
+  return b;
+}
+
+function exportButtons(y,m){
+  let w=node('span','export-buttons');
+  w.append(
+    iconButton('Exportar Excel','Excel',()=>exportExcel(y,m)),
+    iconButton('Exportar PDF','PDF',()=>exportPDF(y,m))
+  );
+  return w;
+}
+
+function renderArchive(){
+  let root=$('#years');
+  root.replaceChildren();
+
+  for(let y of Object.keys(data.years).sort((a,b)=>Number(b)-Number(a))){
+    let wrap=node('div','year'),
+        head=node('div','year-head'),
+        body=node('div','months'),
+        name=node('button','year-name',`⌄ ${y}`),
+        acts=node('div','mini-actions');
+
+    name.onclick=()=>{
+      body.hidden=!body.hidden;
+      name.textContent=`${body.hidden?'›':'⌄'} ${y}`;
+    };
+
+    acts.append(
+      exportButtons(y,null),
+      iconButton('Borrar año','⌫',()=>{
+        if(!confirm(`¿Eliminar el año ${y}? Se borrarán todos sus meses y movimientos. Esta acción no se puede deshacer.`))return;
+        delete data.years[y];
+        if(data.selected.year===y)data.selected={year:'',month:null};
+        save();
+        renderArchive();
+      })
+    );
+
+    head.append(name,acts);
+    wrap.append(head,body);
+
+    for(let m of Object.keys(months(y)).sort((a,b)=>Number(a)-Number(b))){
+      let r=node('div','month'),
+          b=node('button','month-main'),
+          t=totals(y,m),
+          controls=node('div','mini-actions');
+
+      b.append(
+        node('span','',NAMES[+m]),
+        node('small','',`Disponible: ${money(t.income-t.expense)}`)
+      );
+      b.onclick=()=>{current={year:y,month:m};show('detail')};
+
+      controls.append(
+        exportButtons(y,m),
+        iconButton('Editar mes','✎',()=>openMonth(y,m)),
+        iconButton('Borrar mes','⌫',()=>removeMonth(y,m))
+      );
+
+      r.append(b,controls);
+      body.append(r);
+    }
+
+    if(!Object.keys(months(y)).length)
+      body.append(node('p','empty','Aún no hay meses.'));
+
+    let add=node('button','secondary small','+ Añadir mes');
+    add.style.margin='10px 0';
+    add.onclick=()=>openMonth(y);
+    body.append(add);
+    root.append(wrap);
+  }
+
+  if(!Object.keys(data.years).length)
+    root.append(node('p','empty','Añade tu primer año.'));
+}
+
+function renderDetail(){
+  if(!current||!months(current.year)[current.month])return show('archive');
+  let {year,month}=current,t=totals(year,month);
+
+  $('#detailTitle').textContent=`${NAMES[+month]} ${year}`;
+  $('#detailBalance').textContent=money(t.income-t.expense);
+  $('#incomeTotal').textContent=money(t.income);
+  $('#expenseTotal').textContent=money(t.expense);
+
+  let root=$('#entries');
+  root.replaceChildren();
+
+  if(!entries(year,month).length)
+    root.append(node('p','empty','No hay movimientos todavía.'));
+
+  for(let e of entries(year,month)){
+    let r=node('div','entry '+(e.type==='expense'?'expense':'')),
+        info=node('div'),
+        right=node('div','right'),
+        acts=node('div','mini-actions');
+
+    info.append(
+      node('strong','',e.concept),
+      node('small','',e.type==='expense'?'Gasto':'Ingreso')
+    );
+    right.append(node('div','amount',`${e.type==='expense'?'−':'+'}${money(e.amount)}`));
+
+    acts.append(
+      iconButton('Editar movimiento','✎',()=>openEntry(e)),
+      iconButton('Borrar movimiento','⌫',()=>{
+        if(confirm(`¿Borrar «${e.concept}»?`)){
+          months(year)[month].entries=entries(year,month).filter(x=>x.id!==e.id);
+          save();
+          renderDetail();
+        }
+      })
+    );
+
+    right.append(acts);
+    r.append(info,right);
+    root.append(r);
+  }
+}
+
+function renderGoals(){
+  let root=$('#goals');
+  root.replaceChildren();
+
+  if(!data.goals.length)
+    root.append(node('p','empty','Añade tu primera meta de ahorro.'));
+
+  for(let g of data.goals){
+    let box=node('div','goal'),
+        top=node('div','goal-top'),
+        left=node('div'),
+        acts=node('div','mini-actions'),
+        p=Math.min(100,Math.max(0,g.target?g.saved/g.target*100:0));
+
+    left.append(
+      node('div','goal-title',g.name),
+      node('div','goal-meta',`${money(g.saved)} de ${money(g.target)} · ${Math.round(p)} %`)
+    );
+
+    acts.append(
+      iconButton('Editar meta','✎',()=>openGoal(g)),
+      iconButton('Borrar meta','⌫',()=>{
+        if(confirm(`¿Borrar la meta «${g.name}»?`)){
+          data.goals=data.goals.filter(x=>x.id!==g.id);
+          save();
+          renderGoals();
+        }
+      })
+    );
+
+    top.append(left,acts);
+    let bar=node('div','progress'),fill=node('div');
+    fill.style.width=p+'%';
+    bar.append(fill);
+    box.append(top,bar);
+    root.append(box);
+  }
+}
+
+function openModal(title,build,onSave){
+  $('#modalTitle').textContent=title;
+  $('#modalFields').replaceChildren();
+  build($('#modalFields'));
+  modalAction=onSave;
+  $('#overlay').classList.add('show');
+  $('#modalForm').querySelector('input,select')?.focus();
+}
+
+function closeModal(){
+  $('#overlay').classList.remove('show');
+  modalAction=null;
+}
+
+function field(root,label,type,value,name,extra={}){
+  let wrap=node('label','field'),
+      caption=node('span','',label),
+      input=node(type==='select'?'select':'input');
+  input.name=name;
+  if(type!=='select')input.type=type;
+  input.value=value??'';
+  input.required=true;
+  Object.assign(input,extra);
+  wrap.append(caption,input);
+  root.append(wrap);
+  return input;
+}
+
+function openYear(){
+  openModal('Añadir año',r=>
+    field(r,'Año','number',new Date().getFullYear(),'year',{
+      min:'1900',max:'2200',step:'1'
+    }),f=>{
+      let y=String(Number(f.year.value));
+      if(data.years[y])return alert('Este año ya existe.');
+      data.years[y]={};
+      save();
+      closeModal();
+      renderArchive();
+    }
+  );
+}
+
+function openMonth(y,old=null){
+  openModal(old===null?'Añadir mes':'Editar mes',r=>{
+    let s=field(r,'Mes','select',old??'0','month');
+    NAMES.forEach((n,i)=>{
+      let o=node('option','',n);
+      o.value=String(i);
+      s.append(o);
+    });
+    s.value=old??'0';
+  },f=>{
+    let m=f.month.value;
+    if(old!==m&&months(y)[m])return alert('Ese mes ya existe.');
+
+    if(old!==null&&old!==m){
+      months(y)[m]=months(y)[old];
+      delete months(y)[old];
+      if(data.selected.year===y&&data.selected.month===old)
+        data.selected.month=m;
+      if(current?.year===y&&current?.month===old)
+        current.month=m;
+    }else if(old===null){
+      months(y)[m]={entries:[]};
+    }
+
+    save();
+    closeModal();
+    if(current?.year===y&&current?.month===m&&old!==null)
+      show('detail');
+    else renderArchive();
+  });
+}
+
+function removeMonth(y,m){
+  if(!confirm(`¿Eliminar ${NAMES[+m]} ${y} y todos sus movimientos?`))return;
+  delete months(y)[m];
+  if(data.selected.year===y&&data.selected.month===m)
+    data.selected={year:'',month:null};
+  save();
+  if(current?.year===y&&current?.month===m){
+    current=null;
+    show('archive');
+  }else renderArchive();
+}
+
+function openEntry(existing=null){
+  openModal(existing?'Editar movimiento':'Añadir movimiento',r=>{
+    let type=field(r,'Tipo','select',existing?.type||'income','type');
+    [['income','Ingreso'],['expense','Gasto']].forEach(([v,n])=>{
+      let o=node('option','',n);
+      o.value=v;
+      type.append(o);
+    });
+    type.value=existing?.type||'income';
+
+    field(r,'Concepto','text',existing?.concept||'','concept',{
+      maxLength:90,placeholder:'Ej. Nómina, alquiler…'
+    });
+    field(r,'Importe (€)','number',existing?.amount??'','amount',{
+      min:'0.01',step:'0.01',inputMode:'decimal'
+    });
+  },f=>{
+    let amount=Number(f.amount.value),concept=f.concept.value.trim();
+    if(!Number.isFinite(amount)||amount<=0||!concept)
+      return alert('Revisa concepto e importe.');
+
+    let list=entries(current.year,current.month);
+    let obj={
+      id:existing?.id||id(),
+      type:f.type.value,
+      concept,
+      amount:Math.round(amount*100)/100
+    };
+
+    if(existing){
+      let i=list.findIndex(x=>x.id===existing.id);
+      if(i>=0)list[i]=obj;
+    }else list.push(obj);
+
+    save();
+    closeModal();
+    renderDetail();
+  });
+}
+
+function openGoal(existing=null){
+  openModal(existing?'Editar meta':'Añadir meta',r=>{
+    field(r,'¿Para qué quieres ahorrar?','text',existing?.name||'','name',{maxLength:90});
+    field(r,'Objetivo (€)','number',existing?.target??'','target',{min:'0.01',step:'0.01'});
+    field(r,'Ya ahorrado (€)','number',existing?.saved??0,'saved',{min:'0',step:'0.01'});
+  },f=>{
+    let name=f.name.value.trim(),
+        target=Number(f.target.value),
+        saved=Number(f.saved.value);
+
+    if(!name||!Number.isFinite(target)||target<=0||!Number.isFinite(saved)||saved<0)
+      return alert('Revisa los importes.');
+
+    let g={
+      id:existing?.id||id(),
+      name,
+      target:Math.round(target*100)/100,
+      saved:Math.round(saved*100)/100
+    };
+
+    if(existing){
+      let i=data.goals.findIndex(x=>x.id===existing.id);
+      if(i>=0)data.goals[i]=g;
+    }else data.goals.push(g);
+
+    save();
+    closeModal();
+    renderGoals();
+  });
+}
+
+function report(y,m){
+  let rows=[],total={income:0,expense:0};
+
+  for(let mo of (m===null?
+    Object.keys(months(y)).sort((a,b)=>+a-+b):[m])){
+    for(let e of entries(y,mo)){
+      rows.push({
+        Año:y,
+        Mes:NAMES[+mo],
+        Tipo:e.type==='income'?'Ingreso':'Gasto',
+        Concepto:e.concept,
+        Importe:Number(e.amount)||0
+      });
+      total[e.type==='expense'?'expense':'income']+=Number(e.amount)||0;
+    }
+  }
+
+  return {
+    rows,total,
+    title:m===null?`CASHper ${y}`:`CASHper ${NAMES[+m]} ${y}`,
+    filename:`Cashper_${y}${m===null?'':'_'+String(+m+1).padStart(2,'0')}`
+  };
+}
+
+function exportExcel(y,m){
+  let r=report(y,m);
+
+  if(!window.XLSX){
+    alert('Para descargar Excel (.xlsx) necesitas conexión a Internet para cargar la librería de exportación.');
+    return;
+  }
+
+  let rows=[
+    {Año:'',Mes:'',Tipo:'RESUMEN',Concepto:'Ingresos',Importe:r.total.income},
+    {Año:'',Mes:'',Tipo:'RESUMEN',Concepto:'Gastos',Importe:r.total.expense},
+    {Año:'',Mes:'',Tipo:'RESUMEN',Concepto:'Disponible',Importe:r.total.income-r.total.expense},
+    ...r.rows
+  ];
+
+  let wb=XLSX.utils.book_new(),
+      ws=XLSX.utils.json_to_sheet(rows);
+
+  ws['!cols']=[
+    {wch:10},{wch:17},{wch:14},{wch:35},{wch:18}
+  ];
+
+  XLSX.utils.book_append_sheet(wb,ws,'Movimientos');
+  XLSX.writeFile(wb,r.filename+'.xlsx');
+}
+
+function exportPDF(y,m){
+  let r=report(y,m),area=$('#printArea');
+  area.replaceChildren();
+
+  area.append(
+    node('h1','',r.title),
+    node('p','',`Ingresos: ${money(r.total.income)} · Gastos: ${money(r.total.expense)} · Disponible: ${money(r.total.income-r.total.expense)}`)
+  );
+
+  let table=node('table'),thead=node('thead'),tr=node('tr');
+  ['Año','Mes','Tipo','Concepto','Importe'].forEach(x=>
+    tr.append(node('th','',x))
+  );
+  thead.append(tr);
+  table.append(thead);
+
+  let tbody=node('tbody');
+  for(let x of r.rows){
+    let row=node('tr');
+    [x.Año,x.Mes,x.Tipo,x.Concepto,money(x.Importe)].forEach(v=>
+      row.append(node('td','',v))
+    );
+    tbody.append(row);
+  }
+  table.append(tbody);
+  area.append(table);
+  window.print();
+}
+
+$('#dreamsBtn').onclick=()=>show('dreams');
+$('#ghostBtn').onclick=()=>show('archive');
+
+$('#homeDetail').onclick=()=>{
+  let s=selection();
+  if(s){
+    current=s;
+    show('detail');
+  }else show('archive');
+};
+
+document.querySelectorAll('[data-nav]').forEach(b=>
+  b.onclick=()=>show(b.dataset.nav)
+);
+
+$('#addYear').onclick=openYear;
+$('#addGoal').onclick=()=>openGoal();
+$('#addEntry').onclick=()=>openEntry();
+$('#renameMonth').onclick=()=>openMonth(current.year,current.month);
+$('#deleteMonth').onclick=()=>removeMonth(current.year,current.month);
+
+$('#setHome').onclick=()=>{
+  data.selected={...current};
+  save();
+  show('home');
+};
+
+$('#detailExcel').onclick=()=>exportExcel(current.year,current.month);
+$('#detailPdf').onclick=()=>exportPDF(current.year,current.month);
+$('#cancel').onclick=closeModal;
+
+$('#overlay').onclick=e=>{
+  if(e.target===$('#overlay'))closeModal();
+};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+});
+
+$('#modalForm').onsubmit=e=>{
+  e.preventDefault();
+  modalAction?.(e.currentTarget.elements);
+};
+
+renderHome();
+})();
+
+// Registro del Service Worker para la PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js', {
+      scope: './'
+    }).catch(error => {
+      console.error('Error al registrar el Service Worker:', error);
+    });
+  });
+}
+</script>
+</body>
+</html>
